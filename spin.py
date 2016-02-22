@@ -103,12 +103,12 @@ class interface(QtGui.QWidget):
                 deviceNames = self.deviceNames
             ))
         # engage stylus proximity control
-        self.stylus_proximity_control_switch(status = "on")
+        #self.stylus_proximity_control_switch(status = "on")
         # engage acceleration control
         #self.acceleration_control_switch(status = "on")
         # engage display position control
         self.displayPositionStatus = "laptop"
-        self.display_position_control_switch(status = "on")
+        #self.display_position_control_switch(status = "on")
         if not options["--nogui"]:
             # create buttons
             buttonsList = []
@@ -220,80 +220,80 @@ class interface(QtGui.QWidget):
             )
             buttonsList.append(buttonKeyboardOff)
             # button: nipple on
-            buttonNippleOn = QtGui.QPushButton(
-                "nipple on",
-                self
-            )
-            buttonNippleOn.clicked.connect(
-                lambda: self.nipple_switch(status = "on")
-            )
-            buttonsList.append(buttonNippleOn)
+            #buttonNippleOn = QtGui.QPushButton(
+            #    "nipple on",
+            #    self
+            #)
+            #buttonNippleOn.clicked.connect(
+            #    lambda: self.nipple_switch(status = "on")
+            #)
+            #buttonsList.append(buttonNippleOn)
             # button: nipple off
-            buttonNippleOff = QtGui.QPushButton(
-                "nipple off",
-                self
-            )
-            buttonNippleOff.clicked.connect(
-                lambda: self.nipple_switch(status = "off")
-            )
-            buttonsList.append(buttonNippleOff)
+            #buttonNippleOff = QtGui.QPushButton(
+            #    "nipple off",
+            #    self
+            #)
+            #buttonNippleOff.clicked.connect(
+            #    lambda: self.nipple_switch(status = "off")
+            #)
+            #buttonsList.append(buttonNippleOff)
             # button: stylus proximity monitoring on
-            buttonStylusProximityControlOn = QtGui.QPushButton(
-                "stylus proximity monitoring on",
-                self
-            )
-            buttonStylusProximityControlOn.clicked.connect(
-                lambda: self.stylus_proximity_control_switch(status = "on")
-            )
-            buttonsList.append(buttonStylusProximityControlOn)
+            #buttonStylusProximityControlOn = QtGui.QPushButton(
+            #    "stylus proximity monitoring on",
+            #    self
+            #)
+            #buttonStylusProximityControlOn.clicked.connect(
+            #    lambda: self.stylus_proximity_control_switch(status = "on")
+            #)
+            #buttonsList.append(buttonStylusProximityControlOn)
             # button: stylus proximity monitoring off
-            buttonStylusProximityControlOff = QtGui.QPushButton(
-                "stylus proximity monitoring off",
-                self
-            )
-            buttonStylusProximityControlOff.clicked.connect(
-                lambda: self.stylus_proximity_control_switch(status = "off")
-            )
-            buttonsList.append(buttonStylusProximityControlOff)
+            #buttonStylusProximityControlOff = QtGui.QPushButton(
+            #    "stylus proximity monitoring off",
+            #    self
+            #)
+            #buttonStylusProximityControlOff.clicked.connect(
+            #    lambda: self.stylus_proximity_control_switch(status = "off")
+            #)
+            #buttonsList.append(buttonStylusProximityControlOff)
             # button: acceleration monitoring on
-            buttonAccelerationControlOn = QtGui.QPushButton(
-                "acceleration monitoring on",
-                self
-            )
-            buttonAccelerationControlOn.clicked.connect(
-                lambda: self.acceleration_control_switch(status = "on")
-            )
-            buttonsList.append(buttonAccelerationControlOn)
+            #buttonAccelerationControlOn = QtGui.QPushButton(
+            #    "acceleration monitoring on",
+            #    self
+            #)
+            #buttonAccelerationControlOn.clicked.connect(
+            #    lambda: self.acceleration_control_switch(status = "on")
+            #)
+            #buttonsList.append(buttonAccelerationControlOn)
             # button: acceleration monitoring off
-            buttonAccelerationControlOff = QtGui.QPushButton(
-                "acceleration monitoring off",
-                self
-            )
-            buttonAccelerationControlOff.clicked.connect(
-                lambda: self.acceleration_control_switch(status = "off")
-            )
-            buttonsList.append(buttonAccelerationControlOff)
+            #buttonAccelerationControlOff = QtGui.QPushButton(
+            #    "acceleration monitoring off",
+            #    self
+            #)
+            #buttonAccelerationControlOff.clicked.connect(
+            #    lambda: self.acceleration_control_switch(status = "off")
+            #)
+            #buttonsList.append(buttonAccelerationControlOff)
             # button: display position monitoring on
-            buttondisplay_position_controlOn = QtGui.QPushButton(
-                "display position monitoring on",
-                self
-            )
-            buttondisplay_position_controlOn.clicked.connect(
-                lambda: self.display_position_control_switch(status = "on")
-            )
-            buttonsList.append(buttondisplay_position_controlOn)
+            #buttondisplay_position_controlOn = QtGui.QPushButton(
+            #    "display position monitoring on",
+            #    self
+            #)
+            #buttondisplay_position_controlOn.clicked.connect(
+            #    lambda: self.display_position_control_switch(status = "on")
+            #)
+            #buttonsList.append(buttondisplay_position_controlOn)
             # button: display position monitoring off
-            buttondisplay_position_controlOff = QtGui.QPushButton(
-                "display position monitoring off",
-                self
-            )
-            buttondisplay_position_controlOff.clicked.connect(
-                lambda: self.display_position_control_switch(status = "off")
-            )
-            buttonsList.append(buttondisplay_position_controlOff)
+            #buttondisplay_position_controlOff = QtGui.QPushButton(
+            #    "display position monitoring off",
+            #    self
+            #)
+            #buttondisplay_position_controlOff.clicked.connect(
+            #    lambda: self.display_position_control_switch(status = "off")
+            #)
+            #buttonsList.append(buttondisplay_position_controlOff)
             # set button dimensions
-            buttonsWidth  = 240
-            buttonsHeight = 30
+            buttonsWidth  = 140
+            buttonsHeight = 50
             for button in buttonsList:
                 button.setFixedSize(buttonsWidth, buttonsHeight)
                 button.setStyleSheet(
@@ -301,10 +301,10 @@ class interface(QtGui.QWidget):
                     color: #000000;
                     background-color: #ffffff;
                     border: 1px solid #000000;
-                    font-size: 10pt;
+                    font-size: 12pt;
                     text-align: left;
-                    padding-left: 10px;
-                    padding-right: 10px;
+                    padding-left: 5px;
+                    padding-right: 5px;
                     """
                 )
             # set layout
@@ -312,7 +312,7 @@ class interface(QtGui.QWidget):
             vbox.addStretch(1)
             for button in buttonsList:
                 vbox.addWidget(button)
-                vbox.addStretch(1)	
+                vbox.addStretch(1)
             self.setLayout(vbox)
             # window
             self.setWindowTitle("spin")
@@ -705,7 +705,8 @@ class interface(QtGui.QWidget):
             self.display_orientation(orientation     = "left")
             self.touchscreen_orientation(orientation = "left")
             self.touchpad_switch(status              = "off")
-            self.nipple_switch(status                = "off") 
+            self.nipple_switch(status                = "off")
+            self.keyboard_switch(status              = "off")
         elif mode == "laptop":
             self.display_orientation(orientation     = "normal")
             self.touchscreen_orientation(orientation = "normal")
@@ -713,6 +714,7 @@ class interface(QtGui.QWidget):
             self.touchpad_orientation(orientation    = "normal")
             self.touchpad_switch(status              = "on")
             self.nipple_switch(status                = "on")
+            self.keyboard_switch(status              = "on")
         elif mode in ["left", "right", "inverted", "normal"]:
             self.display_orientation(orientation     = mode)
             self.touchscreen_orientation(orientation = mode)
