@@ -201,6 +201,24 @@ class interface(QtGui.QWidget):
                 lambda: self.touchpad_switch(status = "off")
             )
             buttonsList.append(buttonTouchpadOff)
+            # button: keyboard on
+            buttonKeyboardOn = QtGui.QPushButton(
+                "keyboard on",
+                self
+            )
+            buttonKeyboardOn.clicked.connect(
+                lambda: self.keyboard_switch(status = "on")
+            )
+            buttonsList.append(buttonKeyboardOn)
+            # button: keyboard off
+            buttonKeyboardOff = QtGui.QPushButton(
+                "keyboard off",
+                self
+            )
+            buttonKeyboardOff.clicked.connect(
+                lambda: self.keyboard_switch(status = "off")
+            )
+            buttonsList.append(buttonKeyboardOff)
             # button: nipple on
             buttonNippleOn = QtGui.QPushButton(
                 "nipple on",
@@ -462,6 +480,37 @@ class interface(QtGui.QWidget):
         else:
             log.debug("touchpad status unchanged")
 
+    def keyboard_switch(
+        self,
+        status = None
+        ):
+        if "keyboard" in self.deviceNames:
+            xinputStatus = {
+                "on":  "enable",
+                "off": "disable"
+            }
+            if xinputStatus.has_key(status):
+                log.info("change keyboard to {status}".format(
+                    status = status
+                ))
+                engage_command(
+                    "xinput {status} \"{deviceName}\"".format(
+                        status = xinputStatus[status],
+                        deviceName = self.deviceNames["keyboard"]
+                    )
+                )
+            else:
+                _message = "unknown keyboard status \"{status}\" " +\
+                           "requested"
+                log.error(
+                    _message.format(
+                        status = status
+                    )
+                )
+                sys.exit()
+        else:
+            log.debug("keyboard status unchanged")
+
     def nipple_switch(
         self,
         status = None
@@ -498,10 +547,7 @@ class interface(QtGui.QWidget):
         ):
         self.previousStylusProximityStatus = None
         while True:
-            stylusProximityCommand = "xinput query-state " + \
-                                     "\"Wacom ISDv4 EC Pen stylus\" | " + \
-                                     "grep Proximity | cut -d \" \" -f3 | " + \
-                                     " cut -d \"=\" -f2"
+            stylusProximityCommand = 'xinput query-state "%s" | grep Proximity | cut -d " " -f3 | cut -d "=" -f2' % self.deviceNames["stylus"]
             self.stylusProximityStatus = subprocess.check_output(
                 stylusProximityCommand,
                 shell = True
@@ -523,23 +569,26 @@ class interface(QtGui.QWidget):
         self,
         status = None
         ):
-        if status == "on":
-            log.info("change stylus proximity control to on")
-            self.processStylusProximityControl = multiprocessing.Process(
-                target = self.stylus_proximity_control
-            )
-            self.processStylusProximityControl.start()
-        elif status == "off":
-            log.info("change stylus proximity control to off")
-            self.processStylusProximityControl.terminate()
-        else:
-            log.error(
-                "unknown stylus proximity control status \"{status}\" "
-                "requested".format(
-                    status = status
+        if "stylus" in self.deviceNames:
+            if status == "on":
+                log.info("change stylus proximity control to on")
+                self.processStylusProximityControl = multiprocessing.Process(
+                    target = self.stylus_proximity_control
                 )
-            )
-            sys.exit()
+                self.processStylusProximityControl.start()
+            elif status == "off":
+                log.info("change stylus proximity control to off")
+                self.processStylusProximityControl.terminate()
+            else:
+                log.error(
+                    "unknown stylus proximity control status \"{status}\" "
+                    "requested".format(
+                        status = status
+                    )
+                )
+                sys.exit()
+        else:
+            log.debug("stylus proximity status unchanged")
 
     def acceleration_control(self):
         while True:
@@ -600,6 +649,7 @@ class interface(QtGui.QWidget):
             #eventACPIDisplayPositionChange = \
             #    "ibm/hotkey HKEY 00000080 000060c0\n"
             # Ubuntu 14.04 compatibility:
+#            print eventACPI
             eventACPIDisplayPositionChange = \
                 "ibm/hotkey LEN0068:00 00000080 000060c0\n"
             if eventACPI == eventACPIDisplayPositionChange:
@@ -688,8 +738,11 @@ def get_inputs():
                         "ELAN Touchscreen"],
         "touchpad":    ["PS/2 Synaptics TouchPad",
                         "SynPS/2 Synaptics TouchPad"],
+        "keyboard":    ["AT Translated Set 2 keyboard"],
         "nipple":      ["TPPS/2 IBM TrackPoint"],
-        "stylus":      ["Wacom ISDv4 EC Pen stylus"]
+        "stylus":      ["Wacom ISDv4 EC Pen stylus",
+#                        "ELAN Touchscreen Pen"]
+]
     }
     deviceNames = {}
     for device, keyphrases in devicesAndKeyphrases.iteritems():

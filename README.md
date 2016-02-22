@@ -7,6 +7,8 @@ a small utility to assist in setting usage modes of laptop-tablet devices
 ```Bash
 sudo apt-get -y install python-docopt
 sudo apt-get -y install python-qt4
+sudo apt-get -y install xinput
+sudo apt-get -y install acpid
 ```
 
 ## quick start
