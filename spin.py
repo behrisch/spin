@@ -45,34 +45,6 @@ Options:
 name    = "spin"
 version = "2015-04-30T0256Z"
 
-import imp
-import urllib
-
-def smuggle(
-    moduleName = None,
-    URL        = None
-    ):
-    if moduleName is None:
-        moduleName = URL
-    try:
-        module = __import__(moduleName)
-        return(module)
-    except:
-        try:
-            moduleString = urllib.urlopen(URL).read()
-            module = imp.new_module("module")
-            exec moduleString in module.__dict__
-            return(module)
-        except: 
-            raise(
-                Exception(
-                    "module {moduleName} import error".format(
-                        moduleName = moduleName
-                    )
-                )
-            )
-            sys.exit()
-
 import os
 import sys
 import glob
@@ -81,11 +53,8 @@ import multiprocessing
 import socket
 import time
 import logging
+import docopt
 from   PyQt4 import QtGui
-docopt = smuggle(
-    moduleName = "docopt",
-    URL = "https://rawgit.com/docopt/docopt/master/docopt.py"
-)
 
 class interface(QtGui.QWidget):
 
@@ -112,131 +81,20 @@ class interface(QtGui.QWidget):
         if not options["--nogui"]:
             # create buttons
             buttonsList = []
-            # button: tablet mode
-            buttonModeTablet = QtGui.QPushButton(
-                "tablet mode",
-                self
-            )
-            buttonModeTablet.clicked.connect(
-                lambda: self.engage_mode(mode = "tablet")
-            )
-            buttonsList.append(buttonModeTablet)
-            # button: laptop mode
-            buttonModeLaptop = QtGui.QPushButton(
-                "laptop mode",
-                self
-            )
-            buttonModeLaptop.clicked.connect(
-                lambda: self.engage_mode(mode = "laptop")
-            )
-            buttonsList.append(buttonModeLaptop)
-            # button: left
-            buttonLeft = QtGui.QPushButton(
-                "left",
-                self
-            )
-            buttonLeft.clicked.connect(
-                lambda: self.engage_mode(mode = "left")
-            )
-            buttonsList.append(buttonLeft)
-            # button: right
-            buttonRight = QtGui.QPushButton(
-                "right", self
-            )
-            buttonRight.clicked.connect(
-                lambda: self.engage_mode(mode = "right")
-            )
-            buttonsList.append(buttonRight)
-            # button: inverted
-            buttonInverted = QtGui.QPushButton(
-                "inverted",
-                self
-            )
-            buttonInverted.clicked.connect(
-                lambda: self.engage_mode(mode = "inverted")
-            )
-            buttonsList.append(buttonInverted)
-            # button: normal
-            buttonNormal = QtGui.QPushButton(
-                "normal",
-                self
-            )
-            buttonNormal.clicked.connect(
-                lambda: self.engage_mode(mode = "normal")
-            )
-            buttonsList.append(buttonNormal)
-            # button: touchscreen on
-            buttonTouchscreenOn = QtGui.QPushButton(
-                "touchscreen on",
-                self
-            )
-            buttonTouchscreenOn.clicked.connect(
-                lambda: self.touchscreen_switch(status = "on")
-            )
-            buttonsList.append(buttonTouchscreenOn)
-            # button: touchscreen off
-            buttonTouchscreenOff = QtGui.QPushButton(
-                "touchscreen off",
-                self
-            )
-            buttonTouchscreenOff.clicked.connect(
-                lambda: self.touchscreen_switch(status = "off")
-            )
-            buttonsList.append(buttonTouchscreenOff)
-            # button: touchpad on
-            buttonTouchpadOn = QtGui.QPushButton(
-                "touchpad on",
-                self
-            )
-            buttonTouchpadOn.clicked.connect(
-                lambda: self.touchpad_switch(status = "on")
-            )
-            buttonsList.append(buttonTouchpadOn)
-            # button: touchpad off
-            buttonTouchpadOff = QtGui.QPushButton(
-                "touchpad off",
-                self
-            )
-            buttonTouchpadOff.clicked.connect(
-                lambda: self.touchpad_switch(status = "off")
-            )
-            buttonsList.append(buttonTouchpadOff)
-            # button: keyboard on
-            buttonKeyboardOn = QtGui.QPushButton(
-                "keyboard on",
-                self
-            )
-            buttonKeyboardOn.clicked.connect(
-                lambda: self.keyboard_switch(status = "on")
-            )
-            buttonsList.append(buttonKeyboardOn)
-            # button: keyboard off
-            buttonKeyboardOff = QtGui.QPushButton(
-                "keyboard off",
-                self
-            )
-            buttonKeyboardOff.clicked.connect(
-                lambda: self.keyboard_switch(status = "off")
-            )
-            buttonsList.append(buttonKeyboardOff)
-            # button: nipple on
-            #buttonNippleOn = QtGui.QPushButton(
-            #    "nipple on",
-            #    self
-            #)
-            #buttonNippleOn.clicked.connect(
-            #    lambda: self.nipple_switch(status = "on")
-            #)
-            #buttonsList.append(buttonNippleOn)
-            # button: nipple off
-            #buttonNippleOff = QtGui.QPushButton(
-            #    "nipple off",
-            #    self
-            #)
-            #buttonNippleOff.clicked.connect(
-            #    lambda: self.nipple_switch(status = "off")
-            #)
-            #buttonsList.append(buttonNippleOff)
+            for modeName in ("tablet", "laptop", "left", "right", "inverted", "normal"):
+                buttonMode = QtGui.QPushButton(modeName, self)
+                def modeFunction(m):
+                    return lambda: self.engage_mode(m)
+                buttonMode.clicked.connect(modeFunction(modeName))
+                buttonsList.append(buttonMode)
+            for device in ("touchscreen", "touchpad", "keyboard", "nipple"):
+                if device in self.deviceNames:
+                    for status in ("on", "off"):
+                        button = QtGui.QPushButton(device + " " + status, self)
+                        def switchFunction(d, s):
+                            return lambda: self.switch(d, s)
+                        button.clicked.connect(switchFunction(device, status))
+                        buttonsList.append(button)
             # button: stylus proximity monitoring on
             #buttonStylusProximityControlOn = QtGui.QPushButton(
             #    "stylus proximity monitoring on",
@@ -328,219 +186,37 @@ class interface(QtGui.QWidget):
         self.display_position_control_switch(status = "off")
         self.deleteLater() 
 
-    def display_orientation(
-        self,
-        orientation = None
-        ):
-        if orientation in ["left", "right", "inverted", "normal"]:
-            log.info("change display to {orientation}".format(
-                orientation = orientation
-            ))
-            engage_command(
-                "xrandr -o {orientation}".format(
-                    orientation = orientation
-                )
-            )
-        else:
-            log.error(
-                "unknown display orientation \"{orientation}\" "
-                "requested".format(
-                    orientation = orientation
-                )
-            )
-            sys.exit()
-
-    def touchscreen_orientation(
-        self,
-        orientation = None
-        ):
-        if "touchscreen" in self.deviceNames:
+    def orientation(self, device, orientation):
+        if device == "display" or device in self.deviceNames:
             coordinateTransformationMatrix = {
                 "left":     "0 -1 1 1 0 0 0 0 1",
                 "right":    "0 1 0 -1 0 1 0 0 1",
                 "inverted": "-1 0 1 0 -1 1 0 0 1",
                 "normal":   "1 0 0 0 1 0 0 0 1"
             }
-            if coordinateTransformationMatrix.has_key(orientation):
-                log.info("change touchscreen to {orientation}".format(
-                    orientation = orientation
-                ))
-                engage_command(
-                    "xinput set-prop \"{deviceName}\" \"Coordinate "
-                    "Transformation Matrix\" "
-                    "{matrix}".format(
-                        deviceName = self.deviceNames["touchscreen"],
-                        matrix = coordinateTransformationMatrix[orientation]
-                    )
-                )
+            if orientation in coordinateTransformationMatrix:
+                log.info("change %s to %s" % (device, orientation))
+                if device == "display":
+                    engage_command("xrandr -o %s" % orientation)
+                else:
+                    engage_command('xinput set-prop "%s" "Coordinate Transformation Matrix" %s' % (self.deviceNames[device], coordinateTransformationMatrix[orientation]))
             else:
-                log.error(
-                    "unknown touchscreen orientation \"{orientation}\""
-                    " requested".format(
-                        orientation = orientation
-                    )
-                )
+                log.error('unknown %s orientation "%s" requested' % (device, orientation))
                 sys.exit()
         else:
-            log.debug("touchscreen orientation unchanged")
+            log.debug("%s orientation unchanged" % device)
 
-    def touchscreen_switch(
-        self,
-        status = None
-        ):
-        if "touchscreen" in self.deviceNames:
-            xinputStatus = {
-                "on":  "enable",
-                "off": "disable"
-            }
-            if xinputStatus.has_key(status):
-                log.info("change touchscreen to {status}".format(
-                    status = status
-                ))
-                engage_command(
-                    "xinput {status} \"{deviceName}\"".format(
-                        status = xinputStatus[status],
-                        deviceName = self.deviceNames["touchscreen"]
-                    )
-                )
+    def switch(self, device, status):
+        if device in self.deviceNames:
+            xinputStatus = {"on": "enable", "off": "disable"}
+            if status in xinputStatus:
+                log.info("change %s to %s" % (device, status))
+                engage_command('xinput %s "%s"' % (xinputStatus[status], self.deviceNames[device]))
             else:
-                _message = "unknown touchscreen status \"{status}\" " +\
-                           "requested"
-                log.error(
-                    _message.format(
-                        status = status
-                    )
-                )
+                log.error('unknown %s status "%s" requested' % (device, status))
                 sys.exit()
         else:
-            log.debug("touchscreen status unchanged")
-
-    def touchpad_orientation(
-        self,
-        orientation = None
-        ):
-        if "touchpad" in self.deviceNames:
-            coordinateTransformationMatrix = {
-                "left":     "0 -1 1 1 0 0 0 0 1",
-                "right":    "0 1 0 -1 0 1 0 0 1",
-                "inverted": "-1 0 1 0 -1 1 0 0 1",
-                "normal":   "1 0 0 0 1 0 0 0 1"
-            }
-            if coordinateTransformationMatrix.has_key(orientation):
-                log.info("change touchpad to {orientation}".format(
-                    orientation = orientation
-                ))
-                engage_command(
-                    "xinput set-prop \"{deviceName}\" \"Coordinate "
-                    "Transformation Matrix\" "
-                    "{matrix}".format(
-                        deviceName = self.deviceNames["touchpad"],
-                        matrix = coordinateTransformationMatrix[orientation]
-                    )
-                )
-            else:
-                log.error(
-                    "unknown touchpad orientation \"{orientation}\""
-                    " requested".format(
-                        orientation = orientation
-                    )
-                )
-                sys.exit()
-        else:
-            log.debug("touchpad orientation unchanged")
-
-    def touchpad_switch(
-        self,
-        status = None
-        ):
-        if "touchpad" in self.deviceNames:
-            xinputStatus = {
-                "on":  "enable",
-                "off": "disable"
-            }
-            if xinputStatus.has_key(status):
-                log.info("change touchpad to {status}".format(
-                    status = status
-                ))
-                engage_command(
-                    "xinput {status} \"{deviceName}\"".format(
-                        status = xinputStatus[status],
-                        deviceName = self.deviceNames["touchpad"]
-                    )
-                )
-            else:
-                _message = "unknown touchpad status \"{status}\" " +\
-                           "requested"
-                log.error(
-                    _message.format(
-                        status = status
-                    )
-                )
-                sys.exit()
-        else:
-            log.debug("touchpad status unchanged")
-
-    def keyboard_switch(
-        self,
-        status = None
-        ):
-        if "keyboard" in self.deviceNames:
-            xinputStatus = {
-                "on":  "enable",
-                "off": "disable"
-            }
-            if xinputStatus.has_key(status):
-                log.info("change keyboard to {status}".format(
-                    status = status
-                ))
-                engage_command(
-                    "xinput {status} \"{deviceName}\"".format(
-                        status = xinputStatus[status],
-                        deviceName = self.deviceNames["keyboard"]
-                    )
-                )
-            else:
-                _message = "unknown keyboard status \"{status}\" " +\
-                           "requested"
-                log.error(
-                    _message.format(
-                        status = status
-                    )
-                )
-                sys.exit()
-        else:
-            log.debug("keyboard status unchanged")
-
-    def nipple_switch(
-        self,
-        status = None
-        ):
-        if "nipple" in self.deviceNames:
-            xinputStatus = {
-                "on":  "enable",
-                "off": "disable"
-            }
-            if xinputStatus.has_key(status):
-                log.info("change nipple to {status}".format(
-                    status = status
-                ))
-                engage_command(
-                    "xinput {status} \"{deviceName}\"".format(
-                        status = xinputStatus[status],
-                        deviceName = self.deviceNames["nipple"]
-                    )
-                )
-            else:
-                _message = "unknown nipple status \"{status}\" " +\
-                           "requested"
-                log.error(
-                    _message.format(
-                        status = status
-                    )
-                )
-                sys.exit()
-        else:
-            log.debug("nipple status unchanged")
+            log.debug("%s status unchanged" % device)
 
     def stylus_proximity_control(
         self
@@ -694,47 +370,28 @@ class interface(QtGui.QWidget):
             )
             sys.exit()
 
-    def engage_mode(
-        self,
-        mode = None
-        ):
-        log.info("engage mode {mode}".format(
-            mode = mode
-        ))
+    def engage_mode(self, mode):
+        log.info("engage mode %s" % mode)
         if mode == "tablet":
-            self.display_orientation(orientation     = "left")
-            self.touchscreen_orientation(orientation = "left")
-            self.touchpad_switch(status              = "off")
-            self.nipple_switch(status                = "off")
-            self.keyboard_switch(status              = "off")
+            for device in ("display", "stylus", "touchscreen"):
+                self.orientation(device, "left")
+            for device in ("touchpad", "nipple", "keyboard"):
+                self.switch(device, "off")
         elif mode == "laptop":
-            self.display_orientation(orientation     = "normal")
-            self.touchscreen_orientation(orientation = "normal")
-            self.touchscreen_switch(status           = "on")
-            self.touchpad_orientation(orientation    = "normal")
-            self.touchpad_switch(status              = "on")
-            self.nipple_switch(status                = "on")
-            self.keyboard_switch(status              = "on")
-        elif mode in ["left", "right", "inverted", "normal"]:
-            self.display_orientation(orientation     = mode)
-            self.touchscreen_orientation(orientation = mode)
-            self.touchpad_orientation(orientation    = mode)
+            for device in ("display", "stylus", "touchscreen"):
+                self.orientation(device, "normal")
+            for device in ("touchpad", "nipple", "keyboard"):
+                self.switch(device, "on")
+        elif mode in ("left", "right", "inverted", "normal"):
+            for device in ("display", "stylus", "touchscreen", "touchpad"):
+                self.orientation(device, mode)
         else:
-            log.error(
-                "unknown mode \"{mode}\" requested".format(
-                    mode = mode
-                )
-            )
+            log.error('unknown mode "%s" requested' % mode)
             sys.exit()
 
 def get_inputs():
     log.info("audit inputs")
-    inputDevices = subprocess.Popen(
-        ["xinput", "--list"],
-        stdin = subprocess.PIPE,
-        stdout = subprocess.PIPE,
-        stderr = subprocess.PIPE
-    ).communicate()[0]
+    inputDevices = subprocess.check_output(["xinput", "--list"])
     devicesAndKeyphrases = {
         "touchscreen": ["SYNAPTICS Synaptics Touch Digitizer V04",
                         "ELAN Touchscreen"],
@@ -743,39 +400,30 @@ def get_inputs():
         "keyboard":    ["AT Translated Set 2 keyboard"],
         "nipple":      ["TPPS/2 IBM TrackPoint"],
         "stylus":      ["Wacom ISDv4 EC Pen stylus",
-#                        "ELAN Touchscreen Pen"]
-]
+                        "ELAN Touchscreen Pen"]
     }
     deviceNames = {}
-    for device, keyphrases in devicesAndKeyphrases.iteritems():
+    for device, keyphrases in devicesAndKeyphrases.items():
         for keyphrase in keyphrases:
             if keyphrase in inputDevices:
                 deviceNames[device] = keyphrase
-    for device, keyphrases in devicesAndKeyphrases.iteritems():
+    for device, keyphrases in devicesAndKeyphrases.items():
         if device in deviceNames:
             log.info("input {device} detected as \"{deviceName}\"".format(
                 device     = device,
                 deviceName = deviceNames[device]
             ))
         else:
-            log.info("input {device} not detected".format(
-                device = device
-            ))
-    return(deviceNames)
+            log.info("input %s not detected" % device)
+    return deviceNames
 
-def engage_command(
-    command = None
-    ):
+def engage_command(command):
     if options["--debugpassive"] is True:
-        log.info("command: {command}".format(
-            command = command
-        ))
+        log.info("command: %s" % command)
     else:
-        os.system(command)
+        subprocess.call(command, shell=True)
 
-def mean_list(
-    lists = None
-    ):
+def mean_list(lists):
     return([sum(element)/len(element) for element in zip(*lists)])
 
 class AccelerationVector(list):
@@ -823,7 +471,6 @@ class AccelerationVector(list):
         return(list.__repr__(self))
 
 def main(options):
-
     # logging
     global log
     log        = logging.getLogger()
