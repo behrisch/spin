@@ -58,10 +58,7 @@ from   PyQt4 import QtGui
 
 class interface(QtGui.QWidget):
 
-    def __init__(
-        self,
-        options = None
-        ):
+    def __init__(self, options):
         self.options = options
         super(interface, self).__init__()
         log.info("initiate {name}".format(name = name))
@@ -72,12 +69,13 @@ class interface(QtGui.QWidget):
                 deviceNames = self.deviceNames
             ))
         # engage stylus proximity control
-        #self.stylus_proximity_control_switch(status = "on")
+        self.stylus_proximity_control_switch("on")
         # engage acceleration control
         #self.acceleration_control_switch(status = "on")
         # engage display position control
         self.displayPositionStatus = "laptop"
         #self.display_position_control_switch(status = "on")
+        self.orientation = "normal"
         if not options["--nogui"]:
             # create buttons
             buttonsList = []
@@ -95,24 +93,14 @@ class interface(QtGui.QWidget):
                             return lambda: self.switch(d, s)
                         button.clicked.connect(switchFunction(device, status))
                         buttonsList.append(button)
-            # button: stylus proximity monitoring on
-            #buttonStylusProximityControlOn = QtGui.QPushButton(
-            #    "stylus proximity monitoring on",
-            #    self
-            #)
-            #buttonStylusProximityControlOn.clicked.connect(
-            #    lambda: self.stylus_proximity_control_switch(status = "on")
-            #)
-            #buttonsList.append(buttonStylusProximityControlOn)
-            # button: stylus proximity monitoring off
-            #buttonStylusProximityControlOff = QtGui.QPushButton(
-            #    "stylus proximity monitoring off",
-            #    self
-            #)
-            #buttonStylusProximityControlOff.clicked.connect(
-            #    lambda: self.stylus_proximity_control_switch(status = "off")
-            #)
-            #buttonsList.append(buttonStylusProximityControlOff)
+            # button: stylus proximity monitoring
+            if "stylus" in self.deviceNames:
+                for status in ("on", "off"):
+                    button = QtGui.QPushButton("stylus monitor " + status, self)
+                    def controlFunction(s):
+                        return lambda: self.stylus_proximity_control_switch(s)
+                    button.clicked.connect(controlFunction(status))
+                    buttonsList.append(button)
             # button: acceleration monitoring on
             #buttonAccelerationControlOn = QtGui.QPushButton(
             #    "acceleration monitoring on",
@@ -186,25 +174,27 @@ class interface(QtGui.QWidget):
         self.display_position_control_switch(status = "off")
         self.deleteLater() 
 
-    def orientation(self, device, orientation):
-        if device == "display" or device in self.deviceNames:
-            coordinateTransformationMatrix = {
-                "left":     "0 -1 1 1 0 0 0 0 1",
-                "right":    "0 1 0 -1 0 1 0 0 1",
-                "inverted": "-1 0 1 0 -1 1 0 0 1",
-                "normal":   "1 0 0 0 1 0 0 0 1"
-            }
-            if orientation in coordinateTransformationMatrix:
-                log.info("change %s to %s" % (device, orientation))
-                if device == "display":
-                    engage_command("xrandr -o %s" % orientation)
+    def set_orientation(self, orientation):
+        self.orientation = orientation
+        for device in ("display", "stylus", "touchscreen", "touchpad"):
+            if device == "display" or device in self.deviceNames:
+                coordinateTransformationMatrix = {
+                    "left":     "0 -1 1 1 0 0 0 0 1",
+                    "right":    "0 1 0 -1 0 1 0 0 1",
+                    "inverted": "-1 0 1 0 -1 1 0 0 1",
+                    "normal":   "1 0 0 0 1 0 0 0 1"
+                }
+                if orientation in coordinateTransformationMatrix:
+                    log.info("change %s to %s" % (device, orientation))
+                    if device == "display":
+                        engage_command("xrandr -o %s" % orientation)
+                    else:
+                        engage_command('xinput set-prop "%s" "Coordinate Transformation Matrix" %s' % (self.deviceNames[device], coordinateTransformationMatrix[orientation]))
                 else:
-                    engage_command('xinput set-prop "%s" "Coordinate Transformation Matrix" %s' % (self.deviceNames[device], coordinateTransformationMatrix[orientation]))
+                    log.error('unknown %s orientation "%s" requested' % (device, orientation))
+                    sys.exit()
             else:
-                log.error('unknown %s orientation "%s" requested' % (device, orientation))
-                sys.exit()
-        else:
-            log.debug("%s orientation unchanged" % device)
+                log.debug("%s orientation unchanged" % device)
 
     def switch(self, device, status):
         if device in self.deviceNames:
@@ -218,33 +208,26 @@ class interface(QtGui.QWidget):
         else:
             log.debug("%s status unchanged" % device)
 
-    def stylus_proximity_control(
-        self
-        ):
-        self.previousStylusProximityStatus = None
+    def stylus_proximity_control(self):
+        previousStylusProximityStatus = None
         while True:
             stylusProximityCommand = 'xinput query-state "%s" | grep Proximity | cut -d " " -f3 | cut -d "=" -f2' % self.deviceNames["stylus"]
-            self.stylusProximityStatus = subprocess.check_output(
-                stylusProximityCommand,
-                shell = True
-            ).lower().rstrip()
-            if \
-                (self.stylusProximityStatus == "out") and \
-                (self.previousStylusProximityStatus != "out"):
-                log.info("stylus inactive")
-                self.touchscreen_switch(status = "on")
-            elif \
-                (self.stylusProximityStatus == "in") and \
-                (self.previousStylusProximityStatus != "in"):
-                log.info("stylus active")
-                self.touchscreen_switch(status = "off")
-            self.previousStylusProximityStatus = self.stylusProximityStatus
+            stylusProximityStatus = subprocess.check_output(stylusProximityCommand, shell=True).lower().rstrip()
+            if stylusProximityStatus == "out":
+                if previousStylusProximityStatus != "out":
+                    log.info("stylus inactive")
+                    self.switch("touchscreen", "on")
+            elif stylusProximityStatus == "in":
+                if previousStylusProximityStatus != "in":
+                    log.info("stylus active")
+                    self.switch("touchscreen", "off")
+            else:
+                log.info("could not find stylus, resetting oreintation")
+                self.set_orientation(self.orientation)
+            previousStylusProximityStatus = stylusProximityStatus
             time.sleep(0.15)
 
-    def stylus_proximity_control_switch(
-        self,
-        status = None
-        ):
+    def stylus_proximity_control_switch(self, status):
         if "stylus" in self.deviceNames:
             if status == "on":
                 log.info("change stylus proximity control to on")
@@ -373,18 +356,17 @@ class interface(QtGui.QWidget):
     def engage_mode(self, mode):
         log.info("engage mode %s" % mode)
         if mode == "tablet":
-            for device in ("display", "stylus", "touchscreen"):
-                self.orientation(device, "left")
-            for device in ("touchpad", "nipple", "keyboard"):
+            self.set_orientation("left")
+            for device in ("touchpad", "nipple", "keyboard",
+                           "brightness keys", "wireless keys"):
                 self.switch(device, "off")
         elif mode == "laptop":
-            for device in ("display", "stylus", "touchscreen"):
-                self.orientation(device, "normal")
-            for device in ("touchpad", "nipple", "keyboard"):
+            self.set_orientation("normal")
+            for device in ("touchpad", "nipple", "keyboard",
+                           "brightness keys", "wireless keys"):
                 self.switch(device, "on")
         elif mode in ("left", "right", "inverted", "normal"):
-            for device in ("display", "stylus", "touchscreen", "touchpad"):
-                self.orientation(device, mode)
+            self.set_orientation(mode)
         else:
             log.error('unknown mode "%s" requested' % mode)
             sys.exit()
@@ -398,6 +380,8 @@ def get_inputs():
         "touchpad":    ["PS/2 Synaptics TouchPad",
                         "SynPS/2 Synaptics TouchPad"],
         "keyboard":    ["AT Translated Set 2 keyboard"],
+        "brightness keys": ["Video Bus"],
+        "wireless keys":   ["HP Wireless hotkeys"],
         "nipple":      ["TPPS/2 IBM TrackPoint"],
         "stylus":      ["Wacom ISDv4 EC Pen stylus",
                         "ELAN Touchscreen Pen"]
