@@ -41,6 +41,7 @@ Virtual Keyboard
 Hochfrequentes Geräusch
  * Processordrosselung reduzieren hilft nicht
   * http://stackoverflow.com/questions/22482252/how-to-set-intel-idle-max-cstate-0-to-disable-c-states
+  * http://www.breakage.org/2012/11/14/processor-max_cstate-intel_idle-max_cstate-and-devcpu_dma_latency/
   * Überprüfung mit powertop
  * in Marble den Globus bewegen hilft
 Touchscreen
@@ -56,3 +57,16 @@ unwichtig
  * fn lock kann man im BIOS ändern
  * Tastenbelegung pos1 / ende / pgup
 backup auf raspi
+
+
+
+
+Spectre X2
+ToDo:
+Beschleunigungssensor
+HDMI-Adapter
+WebCam auf der Vorderseite
+3D-Kamera auf der Rückseite
+ * http://hackaday.com/2016/01/23/using-realsense-cameras-with-os-x-and-linux/
+ * https://github.com/IntelRealSense/librealsense
+
