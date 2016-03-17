@@ -1,0 +1,58 @@
+funktioniert:
+Touchpad
+ * ubuntu drei Finger Mitteltaste in Einstellungen aktivieren
+ * openSUSE scrolling am Rand in Einstellungen
+Sound
+ * eventuell noch zusätzliche Speaker mit hdajackretask aktivieren
+WLAN
+ * auch An-/Abschaltung mit Flugmodus-Taste geht
+Sondertasten
+ * Lautstärke +/-/stumm, Helligkeit, Lautstärkewippe, Tastaturbeleuchtung
+USB
+ * alle Ports gehen
+HDMI
+ * ging erst im zweiten Versuch, Beamer nach Laptop anschalten
+Stromversorgung
+Stromsparmodus (Sleep mode, Suspend)
+Drucker
+ * splix installieren
+Scanner
+ * pdftk installieren
+VirtualBox
+ * im BIOS Virtualisierung aktivieren
+automount
+Skype
+ * Video
+ * Mikrofon
+Stift
+ * Anpassungen an spin.py für Rotation nötig
+
+
+Mit Einschränkungen:
+Tiefschlaf (Hibernate)
+ * openSUSE braucht root, in ubuntu nicht im Menü
+mplayer
+ * vo x11 für fullscreen
+Display
+ * ubuntu flackert
+ * openSUSE braucht neues X und Artefakte bei Rotation
+Virtual Keyboard
+ * kvkbd (speichert absolute Position daher nach Drehung weg)
+Hochfrequentes Geräusch
+ * Processordrosselung reduzieren hilft nicht
+  * http://stackoverflow.com/questions/22482252/how-to-set-intel-idle-max-cstate-0-to-disable-c-states
+  * Überprüfung mit powertop
+ * in Marble den Globus bewegen hilft
+Touchscreen
+ * keine Mehrfingergesten im Firefox
+  * Grab and Drag Plugin
+ * touchegg für Gesten mit mehr als zwei Fingern, startet nicht immer (?)
+
+
+ToDo:
+Umklappdetektion
+Beschleunigungssensor (Drehung)
+unwichtig
+ * fn lock kann man im BIOS ändern
+ * Tastenbelegung pos1 / ende / pgup
+backup auf raspi
