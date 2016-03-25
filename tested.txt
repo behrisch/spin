@@ -89,3 +89,5 @@ Stromverbrauch hoch
 Suspend führt manchmal zum Absturz
 Hibernate noch nicht getestet
 
+spin.py deaktiviert touchscreen weil Stift beim Start immer als aktiv erkannt wird
+gwenview wird statt dolphin beim Stick aktivieren gestartet
