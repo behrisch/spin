@@ -26,7 +26,8 @@ Skype
  * Mikrofon
 Stift
  * Anpassungen an spin.py für Rotation nötig
-
+ * nur eine Taste geht
+ * evtl. mal http://ubuntuforums.org/showthread.php?t=2304828 probieren
 
 Mit Einschränkungen:
 Tiefschlaf (Hibernate)
@@ -71,11 +72,16 @@ Beschleunigungssensor
 HDMI-Adapter
  * geht
 WebCam auf der Vorderseite
+ * geht nicht
+ * http://ubuntuforums.org/showthread.php?t=2111332
+ * http://ubuntuforums.org/showthread.php?t=2265436
+ * https://wiki.archlinux.org/index.php/Webcam_setup
 3D-Kamera auf der Rückseite
  * http://hackaday.com/2016/01/23/using-realsense-cameras-with-os-x-and-linux/
  * https://github.com/IntelRealSense/librealsense
 wirft regelmäßig den Bootloader raus
- * kann im BIOS umgestellt werden
+ * liegt an efibootmgr
+ * kann im BIOS auf die richtige Reihenfolge umgestellt werden
 
 Bildschirm flackert manchmal extrem
  * nur bei Touchpad / Mausbenutzung
@@ -83,6 +89,8 @@ Bildschirm flackert manchmal extrem
  * Reboot hilft
 
 Stromverbrauch hoch
+ * Bluetooth daemon in KDE deaktiviert
+  * eventuell auch noch global deaktivieren
  * Optimierung mit powertop
  * Stromsparen für SATA host 1 triggert flackern
 
