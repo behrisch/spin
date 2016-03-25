@@ -38,6 +38,10 @@ Display
  * openSUSE braucht neues X und Artefakte bei Rotation
 Virtual Keyboard
  * kvkbd (speichert absolute Position daher nach Drehung weg)
+  * hat manchmal hängende Tasten
+ * onboard
+  * aktiviert sich nicht auf Linksclick
+ * florence
 Hochfrequentes Geräusch
  * Processordrosselung reduzieren hilft nicht
   * http://stackoverflow.com/questions/22482252/how-to-set-intel-idle-max-cstate-0-to-disable-c-states
@@ -65,8 +69,23 @@ Spectre X2
 ToDo:
 Beschleunigungssensor
 HDMI-Adapter
+ * geht
 WebCam auf der Vorderseite
 3D-Kamera auf der Rückseite
  * http://hackaday.com/2016/01/23/using-realsense-cameras-with-os-x-and-linux/
  * https://github.com/IntelRealSense/librealsense
+wirft regelmäßig den Bootloader raus
+ * kann im BIOS umgestellt werden
+
+Bildschirm flackert manchmal extrem
+ * nur bei Touchpad / Mausbenutzung
+ * scheint mit Stromsparmodus zusammenzuhängen
+ * Reboot hilft
+
+Stromverbrauch hoch
+ * Optimierung mit powertop
+ * Stromsparen für SATA host 1 triggert flackern
+
+Suspend führt manchmal zum Absturz
+Hibernate noch nicht getestet
 
