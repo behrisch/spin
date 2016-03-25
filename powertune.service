@@ -1,0 +1,16 @@
+# Runs the powertune script after boot and wake up from suspend.
+[Unit]
+Description=powertune
+After=basic.target
+After=suspend.target
+After=hibernate.target
+After=hybrid-sleep.target
+
+[Service]
+ExecStart=/root/powertune.sh
+
+[Install]
+WantedBy=basic.target
+WantedBy=suspend.target
+WantedBy=hibernate.target
+WantedBy=hybrid-sleep.target
