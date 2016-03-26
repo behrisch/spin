@@ -79,6 +79,7 @@ WebCam auf der Vorderseite
 3D-Kamera auf der Rückseite
  * http://hackaday.com/2016/01/23/using-realsense-cameras-with-os-x-and-linux/
  * https://github.com/IntelRealSense/librealsense
+ * video2 geht
 wirft regelmäßig den Bootloader raus
  * liegt an efibootmgr
  * kann im BIOS auf die richtige Reihenfolge umgestellt werden
@@ -99,3 +100,8 @@ Hibernate noch nicht getestet
 
 spin.py deaktiviert touchscreen weil Stift beim Start immer als aktiv erkannt wird
 gwenview wird statt dolphin beim Stick aktivieren gestartet
+ * in Systemeinstellungen Standard file manager ändern
+Flugmodus-Taste geht nicht
+SIM-Card nicht getestet
+Lautstärketasten am Tablet gehen nicht
+
